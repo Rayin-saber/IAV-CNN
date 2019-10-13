@@ -41,7 +41,6 @@ from validation import evaluate
 
 #os.chdir('/content/drive/My Drive/Colab Notebooks/bioinformatics/data/')
 os.chdir('C:/Users/yinr0002/Google Drive/Tier_2_MOE2014/5_Journal/Bioinformatics_2/data/')
-#os.chdir('/Users/rayin/Google Drive/Tier_2_MOE2014/5_Journal/Bioinformatics_2/data/')
 
 def setup_seed(seed):
      torch.manual_seed(seed)
@@ -391,30 +390,7 @@ def nn_cross_validation(train_x, train_y):
 
 
 
-####################################################################################################################################
-class Net(nn.Module):
-    def __init__(self):
-        super(Net, self).__init__()
-        # 1 input image channel, 6 output channels, 5x5 square convolution
-        # kernel
-        self.conv1 = nn.Conv2d(1, 6, 5)
-        self.conv2 = nn.Conv2d(6, 16, 5)
-        # an affine operation: y = Wx + b
-        self.fc1 = nn.Linear(16 * 5 * 5, 120)
-        self.fc2 = nn.Linear(120, 84)
-        self.fc3 = nn.Linear(84, 2)
-        
-    def forward(self, x):
-        # Max pooling over a (2, 2) window
-        x = F.max_pool2d(F.relu(self.conv1(x)), (2, 2))
-        # If the size is a square you can only specify a single number
-        x = F.max_pool2d(F.relu(self.conv2(x)), 2)
-        x = x.view(-1, self.num_flat_features(x))
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = self.fc3(x)
-        return x    
-
+####################################################################################################################################  
 def lr_baseline(X, Y, X_test, Y_test, method=None):
     setup_seed(20)
     clf = linear_model.LogisticRegression().fit(X, Y) 
@@ -495,78 +471,7 @@ def nn_baseline(X, Y, X_test, Y_test):
     print('V_acc  %.3f\tV_pre %.3f\tV_rec %.3f\tV_fscore %.3f\tV_mcc %.3f'
                 % (val_acc, precision, recall, fscore, mcc))
 
-    
-class CNN_H1N1(nn.Module):
-    def __init__(self):
-        super(CNN_H1N1,self).__init__()
-        self.conv1 = nn.Conv2d(1, 16, kernel_size=3, stride=1, padding=2)
-        self.conv2 = nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=2)
-        self.mp = nn.MaxPool2d(2)
-        self.relu = nn.ReLU()
-        self.fc1 = nn.Linear(32 * 82 * 26,120)  
-        self.fc2 = nn.Linear(120,84)
-        self.fc3 = nn.Linear(84,2)
-        self.dropout = nn.Dropout(p=0.3)
-        self.logsoftmax = nn.LogSoftmax()
-        
-    def forward(self,x):
-        in_size = x.size(0)
-        out = self.relu(self.mp(self.conv1(x)))
-        out = self.relu(self.mp(self.conv2(out)))
-        out = out.view(in_size, -1)
-        out = self.relu(self.fc1(out))
-        out = self.relu(self.fc2(out))
-        out = self.fc3(out)
-        #out = self.dropout(out)
-        return self.logsoftmax(out) 
-    
-class CNN_H3N2(nn.Module):
-    def __init__(self):
-        super(CNN_H3N2,self).__init__()
-        self.conv1 = nn.Conv2d(1, 16, kernel_size=3, stride=1, padding=2)
-        self.conv2 = nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=2)
-        self.mp = nn.MaxPool2d(2)
-        self.relu = nn.ReLU()
-        self.fc1 = nn.Linear(32 * 83 * 26,120)  
-        self.fc2 = nn.Linear(120,84)
-        self.fc3 = nn.Linear(84,2)
-        self.dropout = nn.Dropout(p=0.3)
-        self.logsoftmax = nn.LogSoftmax()
-        
-    def forward(self,x):
-        in_size = x.size(0)
-        out = self.relu(self.mp(self.conv1(x)))
-        out = self.relu(self.mp(self.conv2(out)))
-        out = out.view(in_size, -1)
-        out = self.relu(self.fc1(out))
-        out = self.relu(self.fc2(out))
-        out = self.fc3(out)
-        out = self.dropout(out)
-        return self.logsoftmax(out) 
-
-class CNN_H5N1(nn.Module):
-    def __init__(self):
-        super(CNN_H5N1,self).__init__()
-        self.conv1 = nn.Conv2d(1, 16, kernel_size=3, stride=1, padding=2)
-        self.conv2 = nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=2)
-        self.mp = nn.MaxPool2d(2)
-        self.relu = nn.ReLU()
-        self.fc1 = nn.Linear(32 * 81 * 26,120)  
-        self.fc2 = nn.Linear(120,84)
-        self.fc3 = nn.Linear(84,2)
-        self.dropout = nn.Dropout(p=0.3)
-        self.logsoftmax = nn.LogSoftmax()
-        
-    def forward(self,x):
-        in_size = x.size(0)
-        out = self.relu(self.mp(self.conv1(x)))
-        out = self.relu(self.mp(self.conv2(out)))
-        out = out.view(in_size, -1)
-        out = self.relu(self.fc1(out))
-        out = self.relu(self.fc2(out))
-        out = self.fc3(out)
-        out = self.dropout(out)
-        return self.logsoftmax(out)     
+   
  
 class SEBlock(nn.Module):
     def __init__(self, channels, reduction=16):
@@ -585,67 +490,7 @@ class SEBlock(nn.Module):
 
         return x * w + b # Scale and add bias
 
-# Residual Block with SEBlock
-class ResBlock(nn.Module):
-    def __init__(self, channels):
-        super(ResBlock, self).__init__()
-
-        self.conv_lower = nn.Sequential(
-            nn.Conv2d(channels, channels, 3, padding=1, bias=False),
-            #nn.BatchNorm2d(channels),
-            nn.ReLU()
-        )
-
-        self.conv_upper = nn.Sequential(
-            nn.Conv2d(channels, channels, 3, padding=1, bias=False),
-            #nn.BatchNorm2d(channels)
-        )
-
-        self.se_block = SEBlock(channels)
-
-    def forward(self, x):
-        path = self.conv_lower(x)
-        path = self.conv_upper(path)
-        path = self.se_block(path)
-
-        path = x + path
-        return F.relu(path)
-
 # Network Module
-class IVA_CNN(nn.Module):
-    def __init__(self, in_channel, filters, blocks, num_classes):
-        super(IVA_CNN, self).__init__()
-
-        self.conv_block = nn.Sequential(
-            nn.Conv2d(in_channel, filters, 3, padding=1, bias=False),
-            #nn.BatchNorm2d(filters),
-            nn.ReLU()
-        )
-
-        self.res_blocks = nn.Sequential(*[ResBlock(filters) for _ in range(blocks - 1)])
-
-        self.out_conv = nn.Sequential(
-            nn.Conv2d(filters, 128, 1, padding=0, bias=False),
-            #nn.BatchNorm2d(128),
-            nn.ReLU()
-        )
-
-        self.fc = nn.Linear(128, num_classes)
-        self.drop = nn.Dropout(p=0.5)
-
-    def forward(self, x):
-        x = self.conv_block(x)
-        x = self.res_blocks(x)
-        
-        x = self.out_conv(x)
-        x = F.adaptive_avg_pool2d(x, 1)
-
-        x = x.view(x.data.size(0), -1)
-        x = self.fc(x)
-
-        return F.log_softmax(x, dim=1)   
-    
-
 class BasicBlock(nn.Module):
     def __init__(self, in_planes, planes, stride=1):
         super(BasicBlock, self).__init__()
