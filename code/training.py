@@ -24,7 +24,7 @@ from model import CNN_H1N1
 from model import CNN_H3N2
 from model import CNN_H5N1
 from model import SENet18
-from model import IVA_CNN
+from model import SENet18b
 from model import svm_baseline
 from model import rf_baseline
 from model import lr_baseline
@@ -201,7 +201,7 @@ def main():
                 train_y = torch.tensor(train_y, dtype=torch.int64)
                 test_x = torch.tensor(test_x, dtype=torch.float32)
                 test_y = torch.tensor(test_y, dtype=torch.int64)
-                net = CNN_H1N1()
+                net = SENet18()
 #                if torch.cuda.is_available():
 #                    print('running with GPU')
 #                    net.cuda()
@@ -219,7 +219,7 @@ def main():
                 test_x = torch.tensor(test_x, dtype=torch.float32).cuda()
                 test_y = torch.tensor(test_y, dtype=torch.int64).cuda()
 
-                net = IVA_CNN(1, 128, 2, 2)
+                net = SENet18b()
                 net.cuda()
                 train_cnn(net, parameters['num_of_epochs'], parameters['learning_rate'], parameters['batch_size'], train_x, train_y, test_x, test_y)            
             
@@ -309,7 +309,7 @@ def main():
                 train_y = torch.tensor(train_y, dtype=torch.int64)
                 test_x = torch.tensor(test_x, dtype=torch.float32)
                 test_y = torch.tensor(test_y, dtype=torch.int64)
-                net = CNN_H3N2()
+                net = SENet18b()
 #                if torch.cuda.is_available():
 #                    print('running with GPU')
 #                    net.cuda()
@@ -327,7 +327,7 @@ def main():
                 test_x = torch.tensor(test_x, dtype=torch.float32).cuda()
                 test_y = torch.tensor(test_y, dtype=torch.int64).cuda()
 
-                net = IVA_CNN(1, 128, 2, 2)
+                net = SENet18b()
                 net.cuda()
                 train_cnn(net, parameters['num_of_epochs'], parameters['learning_rate'], parameters['batch_size'], train_x, train_y, test_x, test_y)     
 
@@ -418,7 +418,7 @@ def main():
                 train_y = torch.tensor(train_y, dtype=torch.int64)
                 test_x = torch.tensor(test_x, dtype=torch.float32)
                 test_y = torch.tensor(test_y, dtype=torch.int64)
-                net = CNN_H5N1()
+                net = SENet18()
 #                if torch.cuda.is_available():
 #                    print('running with GPU')
 #                    net.cuda()
@@ -436,7 +436,7 @@ def main():
                 test_x = torch.tensor(test_x, dtype=torch.float32).cuda()
                 test_y = torch.tensor(test_y, dtype=torch.int64).cuda()
 
-                net = IVA_CNN(1, 128, 2, 2)
+                net = SENet18b()
                 net.cuda()
                 train_cnn(net, parameters['num_of_epochs'], parameters['learning_rate'], parameters['batch_size'], train_x, train_y, test_x, test_y)     
 
@@ -446,14 +446,12 @@ if __name__ == '__main__':
     influenza_type = ['H1N1', 'H3N2', 'H5N1']
     method = ['Deep model', 'Tradition model']
     #feature_engineering = ['Min-Shi Lee', 'Yu-Chieh Liao', 'William Lees', 'Peng Yousong', 'Yuhua Yao']
-    H5N1_Antigenic_dist = pd.read_csv('antigenic/H5N1_antigenic.csv')
-    H5N1_seq = pd.read_csv('sequence/H5N1/H5N1_sequence_HA1.csv', names=['seq', 'description'])
     feature, label = cnn_training_data(H5N1_Antigenic_dist, H5N1_seq)
-    subtype = influenza_type[2]
+    subtype = influenza_type[0]
     model_mode = method[0]
     feature_type = ['Min-Shi Lee', 'Yu-Chieh Liao', 'William Lees', 'Peng Yousong', 'Yuhua Yao']
-    #baseline = ['svm_baseline', 'rf_baseline', 'lr_baseline', 'knn_baseline', 'nn_baseline', 'cnn']
-    baseline = ['cnn']
+    baseline = ['svm_baseline', 'rf_baseline', 'lr_baseline', 'knn_baseline', 'nn_baseline', 'iva-cnn']
+    #baseline = ['iva-cnn']
     
     if model_mode == 'Deep model':
         for baseline in baseline:
